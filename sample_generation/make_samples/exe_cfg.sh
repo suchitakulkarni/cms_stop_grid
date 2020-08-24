@@ -1,0 +1,66 @@
+#./run_cfg_test.sh
+#./run_cfg_200_180_5.sh
+#./run_cfg_200_180_10.sh
+#./run_cfg_200_180_15.sh
+#./run_cfg_200_180_20.sh
+#./run_cfg_400_380_20.sh
+#./run_cfg_400_380_15.sh
+#./run_cfg_400_380_5.sh
+
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_400_380_10mm_with_filter_br_1_HT_filter_default.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_200_dm_10_ctau_1980mm.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_200_dm_15_ctau_198mm.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_200_dm_20_ctau_19mm.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_200_dm_25_ctau_19E-1mm.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_200_dm_30_ctau_19E-2mm.py
+
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_300_dm_10_ctau_1980mm.py 
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_300_dm_15_ctau_198mm.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_300_dm_20_ctau_19mm.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_300_dm_25_ctau_19E-1mm.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_300_dm_30_ctau_19E-2mm.py
+
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_400_dm_10_ctau_1980mm.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_400_dm_15_ctau_198mm.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_400_dm_20_ctau_19mm.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_400_dm_25_ctau_19E-1mm.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_400_dm_30_ctau_19E-2mm.py
+
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_500_dm_10_ctau_1980mm.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_500_dm_15_ctau_198mm.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_500_dm_20_ctau_19mm.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_500_dm_25_ctau_19E-1mm.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_500_dm_30_ctau_19E-2mm.py
+
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_200_180_5mm_with_filter_br_1_HT_filter_default.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_200_180_15mm_with_filter_br_1_HT_filter_default.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_200_180_20mm_with_filter_br_1_HT_filter_default.py
+
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_200_180_10mm_with_filter_br_1_HT_filter_default.py
+##./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_200_180_10mm_with_filter_br_09_HT_filter_default.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_200_180_10mm_with_filter_br_08_HT_filter_default.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_200_180_10mm_with_filter_br_07_HT_filter_default.py
+##./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_200_180_10mm_with_filter_br_06_HT_filter_default.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_200_180_10mm_with_filter_br_05_HT_filter_default.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_200_180_10mm_with_filter_br_04_HT_filter_default.py
+##./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_200_180_10mm_with_filter_br_03_HT_filter_default.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_200_180_10mm_with_filter_br_02_HT_filter_default.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_200_180_10mm_with_filter_br_01_HT_filter_default.py
+
+
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_200_dm_10_ctau_19mm_br_1.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_200_dm_10_ctau_19E-1mm_br_1.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_200_dm_10_ctau_1980mm_br_1.py 
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_200_dm_10_ctau_198mm_br_1.py
+
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_200_dm_10_ctau_95E-1mm_br_1.py
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_200_dm_10_ctau_95_br_1.py 
+#./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_200_dm_10_ctau_950_br_1.py
+
+./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_200_dm_10_ctau_708mm_br_1.py
+./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_200_dm_10_ctau_253mm_br_1.py
+./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_200_dm_10_ctau_90mm_br_1.py
+./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_200_dm_10_ctau_32mm_br_1.py
+./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_200_dm_10_ctau_11mm_br_1.py
+./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_200_dm_10_ctau_4mm_br_1.py
+./run_cfg_with_arg_cmssw_9.sh T2tt_displaced_mst_200_dm_10_ctau_1.4mm_br_1.py

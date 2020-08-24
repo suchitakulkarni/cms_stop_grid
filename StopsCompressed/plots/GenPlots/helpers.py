@@ -6,6 +6,16 @@ import argparse, glob, random
 M_PI = 3.14
 speed_of_light = 3E8 #m/s
 
+def compute_eff(hist_passed, hist_all):
+   error_passed = ROOT.Double()
+   integral_passed = hist_passed.IntegralAndError(0, -1, error_passed)
+   error_all = ROOT.Double()
+   integral_all = hist_passed.IntegralAndError(0, -1, error_all)
+   
+   eff = weight_passed/weight_all
+   error = 1/integral_all * np.sqrt((1-eff)**2 * error_passed + eff**2 * error_failed)
+   return [eff, error]
+
 def dxy(x, y, px, py):
     dxy = abs(y*px -x*py)/np.sqrt(px*px+py*py);
     return dxy;
@@ -137,3 +147,9 @@ def draw_from_lifetime(tracklet, tau):
     decaydist = decayvec.Perp()
     eta = decayvec.PseudoRapidity()
     return decaydist, eta
+
+def weight_time_pdf(tau1, tau2, t):
+    oldpdf = 1/tau1*np.exp(-t/tau1)
+    newpdf = 1/tau2*np.exp(-t/tau2)
+    return newpdf/oldpdf
+    #return 1/oldpdf

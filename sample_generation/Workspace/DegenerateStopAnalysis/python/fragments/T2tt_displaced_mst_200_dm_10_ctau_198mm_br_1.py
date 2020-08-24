@@ -3,8 +3,8 @@ from Configuration.Generator.Pythia8CommonSettings_cfi import *
 from Configuration.Generator.Pythia8CUEP8M1Settings_cfi import *
 
 mStop = 200
-mLSP = 160
-ctau = 20.0
+mLSP = 190
+ctau = 198.0 # in mm
 
 hBarCinGeVmm = 1.973269788e-13
 gevWidth = hBarCinGeVmm / ctau
@@ -15,8 +15,11 @@ externalLHEProducer = cms.EDProducer("ExternalLHEProducer",
     scriptName = cms.FileInPath('GeneratorInterface/LHEInterface/data/run_generic_tarball_cvmfs.sh'),
     numberOfParameters = cms.uint32(4),
     args = cms.vstring(
-         '/afs/cern.ch/user/s/sukulkar/work/sukulkar/public/genproductions/bin/MadGraph5_aMCatNLO/leptonic_displaced_stops_%s_slc6_amd64_gcc630_CMSSW_9_3_16_tarball.tar.xz' %(mStop),
-         'false'
+         #'/afs/cern.ch/user/s/sukulkar/work/sukulkar/public/genproductions/bin/MadGraph5_aMCatNLO/leptonic_displaced_stops_%s_slc6_amd64_gcc630_CMSSW_9_3_16_tarball.tar.xz' %(mStop),
+         '/cvmfs/cms.cern.ch/phys_generator/gridpacks/2017/13TeV/madgraph/V5_2.4.2/sus_sms/LO_PDF/SMS-StopStop/v1/SMS-StopStop_mStop-%s_slc6_amd64_gcc481_CMSSW_7_1_30_tarball.tar.xz' %(mStop),
+         'false',
+         'slc6_amd64_gcc481',
+         'CMSSW_7_1_30'
     ),
 )
 
@@ -65,7 +68,8 @@ DECAY   2000004     0.00000000E+00   # scharm_R decays
 DECAY   1000005     0.00000000E+00   # sbottom1 decays
 DECAY   2000005     0.00000000E+00   # sbottom2 decays
 DECAY   1000006     %CTAU0%   # stop1 decays
-#    1.00000000E+00   4    -13     5     14      1000022 # br(~t_1 -> chi_10 b mu+ nu)
+    0.00000000E+00    2    1000022      4
+    0.00000000E+00    4    1000022      5     -1    2  # dummy allowed decay, in order to turn on off-shell decays
     1.00000000E+00    3    1000022      5   24
 DECAY   2000006     0.00000000E+00   # stop2 decays
 DECAY   1000011     0.00000000E+00   # selectron_L decays
@@ -101,23 +105,11 @@ def matchParams(mass):
   elif mass<1801: return 70., 0.243
 
 qcut, tru_eff = matchParams(mStop)
-wgt = 50/tru_eff #NOTE: config weight, I generate 50k events
+#wgt = 50/tru_eff #NOTE: config weight
 
 basePythiaParameters = cms.PSet(
     pythia8CommonSettingsBlock,
     pythia8CUEP8M1SettingsBlock,
-    processParameters = cms.vstring(
-      '24:mMin = 0.05',
-      '24:onMode = off',
-      '24:onIfAny = 11 13 15', # only leptonic W decays
-      'ResonanceDecayFilter:filter = on',
-      'ResonanceDecayFilter:exclusive = on', #off: require at least the specified number of daughters, on: require exactly the specified number of daughters
-      'ResonanceDecayFilter:eMuAsEquivalent = off', #on: treat electrons and muons as equivalent
-      'ResonanceDecayFilter:eMuTauAsEquivalent = on', #on: treat electrons, muons , and taus as equivalent
-      'ResonanceDecayFilter:allNuAsEquivalent = off', #on: treat all three neutrino flavours as equivalent
-      #'ResonanceDecayFilter:mothers = ', #list of mothers not specified -> count all particles in hard process+resonance decays (better to avoid specifying mothers when including leptons from the lhe in counting, since intermediate resonances are not gauranteed to appear in general
-      'ResonanceDecayFilter:daughters = 13, -13',
-    ),
     JetMatchingParameters = cms.vstring(
       'JetMatching:setMad = off',
       'JetMatching:scheme = 1',
@@ -137,8 +129,7 @@ basePythiaParameters = cms.PSet(
     ),
     parameterSets = cms.vstring('pythia8CommonSettings',
                                 'pythia8CUEP8M1Settings',
-                                'JetMatchingParameters',
-                                'processParameters'
+                                'JetMatchingParameters'
     )
     )
 
@@ -155,7 +146,7 @@ generator = cms.EDFilter("Pythia8HadronizerFilter",
   PythiaParameters = basePythiaParameters,
   SLHATableForPythia8 = cms.string('%s' % slhatable),
   ConfigDescription = cms.string('%s_%i_%i' % (model, mStop, mLSP)),
-  ConfigWeight = cms.double(wgt),
+  #ConfigWeight = cms.double(wgt),
 )
 
 
@@ -263,4 +254,3 @@ ProductionFilterSequence = cms.Sequence(generator*
                                     tmpAk4GenJetsNoNu * genHTFilter *
                                     tmpGenMetTrue * genMETfilter1 * genMETfilter2
 )
-
