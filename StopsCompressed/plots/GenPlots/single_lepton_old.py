@@ -8,6 +8,18 @@ from math   import sqrt
 import argparse, os
 from helpers import *
 
+
+def get_eff(histA, histB, histC):
+    errorA = ROOT.Double()
+    histA_int = histA.IntegralAndError(0, -1, errorA)
+    errorB = ROOT.Double()
+    histB_int = histB.IntegralAndError(0, -1, errorB)
+    histC_int = histC.Integral(0, -1)
+    pEff = ROOT.TEfficiency(histA, histB)
+    pEff_eff = pEff.GetEfficiency(1)
+    pEff_err = (pEff.GetEfficiencyErrorLow(1) + pEff.GetEfficiencyErrorUp(1))/2
+    return histA_int, errorA, pEff_eff, pEff_err, histA_int/histC_int
+    
     
 parser = argparse.ArgumentParser(description='Process some arguements')
 parser.add_argument("-f", type=str, action='append', nargs='+',
@@ -15,46 +27,39 @@ parser.add_argument("-f", type=str, action='append', nargs='+',
 parser.add_argument("-o", type=str,
                     help='output_directory')
 
-parser.add_argument("-mst", type=str,
-                    help='mass of stop')
-
 parser.add_argument("-truetau", type=str,
                     help='true time in mm')
 parser.add_argument("-newtau", type=str,
-                    help='new time in mm (for no reweighting give same as truetau)')
+                    help='new time in mm')
 
 parser.add_argument("-truebr", type=str,
-                    help='true BR (four body)')
+                    help='true BR (two body)')
 parser.add_argument("-newbr", type=str,
-                    help='new BR (four body) (for no reweighting give same as truebr)')
+                    help='new BR (two body)')
 args = parser.parse_args()
 
 outdir = args.o
 if not os.path.exists(outdir):os.mkdir(outdir)
 infile = args.f[0]
 
-mst = float( args.mst)
-true_time = float(args.truetau)
-new_time = float(args.newtau)
+true_disp = float(args.truetau)
+new_disp = float(args.newtau)
 
+#sys.exit()
 true_br = float(args.truebr)
 new_br = float(args.newbr)
-
+print 'input file = ', infile
+print 'true_disp = ', true_disp
+print 'new_disp = ', new_disp
+print 'true_br = ', true_br
+print 'new_br = ', new_br
 c_in_mm = 3e11 # speed of light in mm per second
+true_time = true_disp
+new_time = new_disp
 
-#brnaching ratio of W to electron and muon
-Wbr = 0.2
-
-#new_br is either the same as true_br or is the target BR so just take new_br for finding normalisation
-br = Wbr*new_br
-xsec = get_xsec(mst = mst)*(2*br -br*br)*get_filter_eff(mst = mst)
-
-print 'prodxsec = ', get_xsec(mst = mst)
-print 'newbr = ', new_br
-print 'filter_eff =', get_filter_eff(mst = mst)
-print 'xsec = ', xsec
-#sys.exit()
 events = Events(infile)
+
+
 # GEN
 edmCollections = { 
 'genParticles':{'type':'vector<reco:GenParticle>', 'label': ( "genParticles", "", "GEN" ) },
@@ -67,15 +72,42 @@ for k, v in edmCollections.iteritems(): v['handle'] = Handle(v['type'])
 
 nevents = events.size()
 #nevents = 100
+for ainfile in infile:
+  print ainfile
+  if 'T2tt_displaced_200_180_10mm' in ainfile: xsec = 9.08E+02 #/nevents
+  if 'T2tt_displaced_mst_200_dm_10' in ainfile: xsec = 9.08E+02 #/nevents
+  # the cross section below is multiplied by gen filter efficiency, it is for 1fb^-1 lumi
+  if 'T2tt_displaced_mst_500_dm_10_ctau_1980mm' in ainfile: xsec = 1.60E+00#/nevents  
+  if 'T2tt_displaced_mst_500_dm_15_ctau_198mm' in ainfile: xsec = 8.2#/nevents
+  if 'T2tt_displaced_mst_500_dm_20_ctau_19mm' in ainfile: xsec = 9.89E+00#/nevents  
+  if 'T2tt_displaced_mst_500_dm_25_ctau_19E-1mm' in ainfile: xsec = 1.48E+01#/nevents  
+  if 'T2tt_displaced_mst_500_dm_30_ctau_19E-2mm' in ainfile: xsec = 1.67E+01#/nevents  
+
+  if 'T2tt_displaced_mst_400_dm_10_ctau_1980mm' in ainfile: xsec = 4.97E+00#/nevents  
+  if 'T2tt_displaced_mst_400_dm_15_ctau_198mm' in ainfile: xsec = 2.55E+01#/nevents
+  if 'T2tt_displaced_mst_400_dm_20_ctau_19mm' in ainfile: xsec = 3.08E+01#/nevents  
+  if 'T2tt_displaced_mst_400_dm_25_ctau_19E-1mm' in ainfile: xsec = 4.68E+01#/nevents  
+  if 'T2tt_displaced_mst_400_dm_30_ctau_19E-2mm' in ainfile: xsec = 5.17E+01#/nevents  
+
+  if 'T2tt_displaced_mst_300_dm_10_ctau_1980mm' in ainfile: xsec = 1.83E+01#/nevents  
+  if 'T2tt_displaced_mst_300_dm_15_ctau_198mm' in ainfile: xsec = 9.36E+01#/nevents
+  if 'T2tt_displaced_mst_300_dm_20_ctau_19mm' in ainfile: xsec = 1.15E+02#/nevents  
+  if 'T2tt_displaced_mst_300_dm_25_ctau_19E-1mm' in ainfile: xsec = 1.70E+02#/nevents  
+  if 'T2tt_displaced_mst_300_dm_30_ctau_19E-2mm' in ainfile: xsec = 1.91E+02#/nevents  
+
+  if 'T2tt_displaced_mst_200_dm_10_ctau_1980mm' in ainfile: xsec = 9.08E+01#/nevents  
+  if 'T2tt_displaced_mst_200_dm_15_ctau_198mm' in ainfile: xsec = 4.56E+02#/nevents
+  if 'T2tt_displaced_mst_200_dm_20_ctau_19mm' in ainfile: xsec = 5.64E+02#/nevents  
+  if 'T2tt_displaced_mst_200_dm_25_ctau_19E-1mm' in ainfile: xsec = 8.40E+02#/nevents   
+  if 'T2tt_displaced_mst_200_dm_30_ctau_19E-2mm' in ainfile: xsec = 9.36E+02#/nevents
+print 'xsec = ', xsec
 
 cutflowfile = open(outdir+'/stop_cutflow_eff.txt', 'w')
 
 f = ROOT.TFile( outdir+'/stop_tot.root', 'recreate' )
 hist_MET = ROOT.TH1F("MET", "MET of events", 1000, 0 , 1000)
-hist_UNMET = ROOT.TH1F("UnMET", "MET of unweighted events", 1000, 0 , 1000)
-hist_REMET = ROOT.TH1F("ReMET", "MET of reweighted events", 1000, 0 , 1000)
-hist_stop_time_from_rho = ROOT.TH1F("stop_time_from_rho", "stop time", 5000, 0, 5000)
-hist_stop_time_rwt = ROOT.TH1F("stop_time_rwt", "reweighted stop time", 5000, 0, 5000)
+hist_stop_time_from_rho = ROOT.TH1F("stop_time_from_rho", "stop time", 1000, 0, 20)
+hist_stop_time_rwt = ROOT.TH1F("stop_time_rwt", "reweighted stop time", 1000, 0, 20)
 hist_muon_lxy = ROOT.TH1F("muon_lxy", "Lxy of the muon emerging from stop", 10000, 0, 50)
 hist_muon_dxy = ROOT.TH1F("muon_dxy", "dxy of the muon emerging from stop", 10000, 0, 100)
 hist_muon_lxy_2D = ROOT.TH2F( "muon_lxy_2D", '2D Lxy of muons', 1000, 0., 1000, 1000, 0, 1000 )
@@ -115,7 +147,8 @@ hist_dphi25.Sumw2()
 hist_dxy_1_10.Sumw2()
 hist_dxy_02_1.Sumw2()
 print 'total number of events = ', nevents
-#nevents = 5000
+#sys.exit()
+#nevents = 1000
 mothers = []
 for i in range(nevents):
   #print 'new event'
@@ -171,33 +204,29 @@ for i in range(nevents):
                      gd1 = gd1.daughter(0)
                      if abs(gd1.pdgId()) == 11 and gd1.status() == 1: daughter_electrons.append(gd1)
 
-  newweight = 1.0
-  hist_UNMET.Fill(met, 1)
+
+  #if len(daughter_muons) == 0: continue
   for lsp in daughter_LSPs:
-     stopweight = 1.0
      mom = lsp
      while mom.pdgId() == lsp.pdgId(): mom = mom.mother()
+     #print 'stop daughters = ', int(mom.numberOfDaughters())
      if int(mom.numberOfDaughters()) == 2 : event_2bdy =  True
      if int(mom.numberOfDaughters()) == 3 : event_4bdy = True
      if (new_br != true_br):
-        if int(mom.numberOfDaughters()) == 2 : stopweight = stopweight*((1-new_br)/(1-true_br))
-        if int(mom.numberOfDaughters()) == 3 : stopweight = stopweight*(new_br/true_br)
-     else: stopweight = 1.0
+        if int(mom.numberOfDaughters()) == 2 : newweight = newweight*((1-new_br)/(1-true_br))
+        if int(mom.numberOfDaughters()) == 3 : newweight = newweight*(new_br/true_br)
+     else: newweight = 1.0
      neut_rho = lsp.vertex().rho()
      stop_rho = mom.vertex().rho()
      stop_lxy = neut_rho - stop_rho
      stop_time = stop_lxy*mom.mass()/mom.pt()
      hist_stop_time_from_rho.Fill(stop_time, 1)
-     if (true_time != new_time): stopweight =  stopweight*weight_time_pdf(true_time, new_time, stop_time*10)
-     else: stopweight = stopweight*1.0
-     hist_stop_time_rwt.Fill(stop_time, stopweight)
-     newweight = newweight*stopweight
+     if (true_time != new_time): newweight =  newweight*weight_time_pdf(true_time, new_time, stop_time*10)
+     else: newweight = newweight*1.0
 
-  hist_REMET.Fill(met, newweight)
-  hist_all.Fill(1, newweight)
-  #if len(daughter_muons) == 0: continue 
+ 
   if event_2bdy == True and event_4bdy == True: event_mixed = True; event_2bdy = False; event_4bdy = False
-  #hist_all.Fill(1, newweight)
+  hist_all.Fill(1, newweight)
   if met < 200: continue
   hist_met200.Fill(1, newweight)
   if total_ht < 300: continue
@@ -212,8 +241,6 @@ for i in range(nevents):
   hist_HT.Fill(total_ht, newweight)
   hist_MET.Fill(met, newweight)
 
-  goodel = False
-  goodmu = False
   if len(daughter_electrons) >= 1:
     for el in daughter_electrons:
        mom = el
@@ -222,17 +249,22 @@ for i in range(nevents):
        stop_rho = mom.vertex().rho()
        stop_lxy = el_rho - stop_rho
        goodel = False
-       #goodel = (el.pt() > 5 and abs(el.eta()) < 2.5 and stop_lxy < 5) 
-       goodel = (el.pt() > 5 and abs(el.eta()) < 2.5) 
+       goodel = (el.pt() > 5 and abs(el.eta()) < 2.5 and stop_lxy < 5) 
        if goodel: break
-  
-  if len(daughter_muons) >= 1:
-      for mu in daughter_muons:
-         goodmu = False
-         goodmu = (mu.pt() > 3.5 and abs(mu.eta()) < 2.4)
-         if goodmu:  break
-  if (goodmu or goodel): hist_mu35.Fill(1, newweight)
+  hist_el5.Fill(1, newweight)
+  # at least one muon with pT > 3.5
+  if len(daughter_muons) == 2:
+    mu1 = False
+    mu2 = False
+    mu1 = (daughter_muons[0].pt() > 3.5 and abs(daughter_muons[0].eta()) < 2.4)
+    mu2 = (daughter_muons[1].pt() > 3.5 and abs(daughter_muons[1].eta()) < 2.4)
+    if not (mu1 or mu2): continue
+  elif len(daughter_muons) == 1:
+    mu1 = False
+    mu1 = (daughter_muons[0].pt() > 3.5 and abs(daughter_muons[0].eta()) < 2.4)
+    if not (mu1): continue
   else: continue
+  hist_mu35.Fill(1, newweight)
 
   for lsp in daughter_LSPs:
      mom = lsp
@@ -252,6 +284,7 @@ for i in range(nevents):
   condition_dxy_1 =  False
   lepton_array = daughter_muons
   lepton_array.extend(daughter_electrons)
+
   for lepton in lepton_array:
      mom = lepton
      while abs(mom.pdgId()) != 1000006: mom = mom.mother()
@@ -268,8 +301,8 @@ for i in range(nevents):
         condition_dxy_02 = (lepton.pt() > 3.5 and abs(lepton.eta()) < 2.4 and 0.2 < lepton_dxy < 1) or condition_dxy_02
         condition_dxy_1 = (lepton.pt() > 3.5 and abs(lepton.eta()) < 2.4 and 1 < lepton_dxy < 10) or condition_dxy_1
      if abs(lepton.pdgId()) == 11:
-        condition_dxy_02 = (lepton.pt() > 5 and abs(lepton.eta()) < 2.5 and 0.2 < lepton_dxy < 1) or condition_dxy_02
-        condition_dxy_1 = (lepton.pt() > 5 and abs(lepton.eta()) < 2.5 and 1 < lepton_dxy < 5) or condition_dxy_1
+        condition_dxy_02 = (lepton.pt() > 5 and abs(lepton.eta()) < 2.5 and 0.2 < lepton_dxy < 1 and lepton_lxy < 5) or condition_dxy_02
+        condition_dxy_1 = (lepton.pt() > 5 and abs(lepton.eta()) < 2.5 and 1 < lepton_dxy < 10 and lepton_lxy < 5) or condition_dxy_1
 
   if condition_dxy_02: 
 	hist_dxy_02_1.Fill(1, newweight)#; print "found good lepton, dxy < 1"
@@ -306,9 +339,8 @@ hist_2bdy_dxy_02_1.Scale(scale)
 print 'final numbe of events are = ', hist_all.Integral(0, -1)
 cutflowfile.write('#file processed are\n')
 cutflowfile.write('# %s \n' %(infile))
-cutflowfile.write('# Total number of generated events = %s \n' %(nevents))
-cutflowfile.write('#True tau = %s \n' %(true_time))
-cutflowfile.write('#Reweighted tau = %s \n' %(new_time))
+cutflowfile.write('#True tau = %s \n' %(true_disp))
+cutflowfile.write('#Reweighted tau = %s \n' %(new_disp))
 cutflowfile.write('# True BR = %s \n' %(true_br))
 cutflowfile.write('# Reweighted BR = %s \n' %(new_br))
 
@@ -332,10 +364,10 @@ cutflowfile.write('pt(j1) > 100 \t \t %0.2E \t %0.2E \t %0.2E \t %0.2E \t %0.2E 
 histint, error, pEff_eff, pEff_err, cut_eff = get_eff(hist_dphi25, hist_all, hist_ptj250)
 cutflowfile.write('dphi > 2.5 \t \t %0.2E \t %0.2E \t %0.2E \t %0.2E \t %0.2E \n' %(histint, error, pEff_eff, pEff_err, cut_eff))
 
-#histint, error, pEff_eff, pEff_err, cut_eff = get_eff(hist_el5, hist_all, hist_dphi25)
-#cutflowfile.write('el > 5 \t \t %0.2E \t %0.2E \t %0.2E \t %0.2E \t %0.2E \n' %(histint, error, pEff_eff, pEff_err, cut_eff))
+histint, error, pEff_eff, pEff_err, cut_eff = get_eff(hist_el5, hist_all, hist_dphi25)
+cutflowfile.write('el > 5 \t \t %0.2E \t %0.2E \t %0.2E \t %0.2E \t %0.2E \n' %(histint, error, pEff_eff, pEff_err, cut_eff))
 
-histint, error, pEff_eff, pEff_err, cut_eff = get_eff(hist_mu35, hist_all, hist_dphi25)
+histint, error, pEff_eff, pEff_err, cut_eff = get_eff(hist_mu35, hist_all, hist_el5)
 cutflowfile.write('mu > 3.5 \t \t %0.2E \t %0.2E \t %0.2E \t %0.2E \t %0.2E \n' %(histint, error, pEff_eff, pEff_err, cut_eff))
 
 histint, error, pEff_eff, pEff_err, cut_eff = get_eff(hist_2bdy_dxy_02_1, hist_all, hist_mu35)
