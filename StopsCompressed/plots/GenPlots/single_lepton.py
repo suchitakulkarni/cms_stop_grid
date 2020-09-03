@@ -139,13 +139,12 @@ for i in range(nevents):
   for k, v in edmCollections.iteritems():
     events.getByLabel(v['label'], v['handle'])
     products[k] = v['handle'].product()
-
+  
+  # Just get the MET and HT of the eveny
   for p in products['genMET']: met = p.pt() #hist_MET.Fill(p.pt())
 
-  #hist_genjet_pt.Fill(products['ak4GenJets'][0].pt())
-
   for p in products['ak4GenJets']: total_ht = total_ht + p.pt()
-
+  # create containers for electrons, muons. I start with stop so that I can remove taus, I look for W decays to muons or electrons, no taus.
   for p in products['genParticles']: 
       if abs(p.pdgId()) == 1000006 and p.status() == 22:
         while abs(p.daughter(0).pdgId()) == 1000006: p = p.daughter(0)
@@ -172,7 +171,7 @@ for i in range(nevents):
                      if abs(gd1.pdgId()) == 11 and gd1.status() == 1: daughter_electrons.append(gd1)
 
   newweight = 1.0
-  hist_UNMET.Fill(met, 1)
+  # Determine the correct weight of the event, I start with every LSP, work upwords to find progenitor stop and then compute the weight for BR or lighteime reweighting
   for lsp in daughter_LSPs:
      stopweight = 1.0
      mom = lsp
@@ -193,25 +192,33 @@ for i in range(nevents):
      hist_stop_time_rwt.Fill(stop_time, stopweight)
      newweight = newweight*stopweight
 
-  hist_REMET.Fill(met, newweight)
+  #Now apply all cuts
+  # The first histogram are uncut events
   hist_all.Fill(1, newweight)
-  #if len(daughter_muons) == 0: continue 
+  # Determine if the event has two body, four body or mixed events, this is book keeping has no effect for sensitivity, events in SR
   if event_2bdy == True and event_4bdy == True: event_mixed = True; event_2bdy = False; event_4bdy = False
-  #hist_all.Fill(1, newweight)
+  # MET requirement
   if met < 200: continue
   hist_met200.Fill(1, newweight)
+  # HT requirement
   if total_ht < 300: continue
   hist_ht300.Fill(1, newweight)
+  # leading jet
   if products['ak4GenJets'][0].pt() < 100 and abs(products['ak4GenJets'][0].eta()) < 2.5: continue
   hist_ptj1100.Fill(1, newweight)
+  #subleading jet
   if products['ak4GenJets'][1].pt() < 50 and abs(products['ak4GenJets'][1].eta()) < 2.5: continue
   hist_ptj250.Fill(1, newweight)
+  # delta phi betweeen jets
   if DeltaPhi(products['ak4GenJets'][0].phi(), products['ak4GenJets'][1].phi()) > 2.5: continue
   hist_dphi25.Fill(1, newweight)
+  #Following histograms are only for verification purposes, have no effect on events in SR
   hist_genjet_pt.Fill(products['ak4GenJets'][0].pt(), newweight)
   hist_HT.Fill(total_ht, newweight)
   hist_MET.Fill(met, newweight)
-
+  # Now let's check if we have at least one electron or muon in the SR
+  # start with electrons
+  
   goodel = False
   goodmu = False
   if len(daughter_electrons) >= 1:
@@ -225,15 +232,16 @@ for i in range(nevents):
        #goodel = (el.pt() > 5 and abs(el.eta()) < 2.5 and stop_lxy < 5) 
        goodel = (el.pt() > 5 and abs(el.eta()) < 2.5) 
        if goodel: break
-  
+  # check for muons
   if len(daughter_muons) >= 1:
       for mu in daughter_muons:
          goodmu = False
          goodmu = (mu.pt() > 3.5 and abs(mu.eta()) < 2.4)
          if goodmu:  break
+  # Check if either electron or muon passes criteria
   if (goodmu or goodel): hist_mu35.Fill(1, newweight)
   else: continue
-
+  # Verification purposes Lxy histo, no impact of SR
   for lsp in daughter_LSPs:
      mom = lsp
      while mom.pdgId() == lsp.pdgId(): mom = mom.mother()
@@ -247,11 +255,13 @@ for i in range(nevents):
 
   lep_lxy = []
   lep_dxy = []
-
+  # check now if in SR we have electrons or muons
   condition_dxy_02 =  False
   condition_dxy_1 =  False
+  # create a lepton array
   lepton_array = daughter_muons
   lepton_array.extend(daughter_electrons)
+  # In principle the pT eta cuts should not be necessary below but I am just being cautious
   for lepton in lepton_array:
      mom = lepton
      while abs(mom.pdgId()) != 1000006: mom = mom.mother()
@@ -283,7 +293,7 @@ for i in range(nevents):
         if event_mixed == True: hist_mixed_dxy_1_10.Fill(1, newweight)
   
 
-
+# scale histograms to normalize events
 scale = ROOT.Double()
 scale = xsec/hist_all.Integral(0, -1)
 hist_all.Scale(scale)
@@ -303,6 +313,7 @@ hist_mixed_dxy_02_1.Scale(scale)
 hist_4bdy_dxy_02_1.Scale(scale)
 hist_2bdy_dxy_02_1.Scale(scale)
 
+# write out a text file
 print 'final numbe of events are = ', hist_all.Integral(0, -1)
 cutflowfile.write('#file processed are\n')
 cutflowfile.write('# %s \n' %(infile))
